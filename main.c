@@ -1,54 +1,38 @@
 #include "myshell.h"
+
 /**
- * main - entry point
- * @ac: argc
- * @arv: argv
- * @envp: environment
- * Return: 0 on success
+ * main - Entry point of the shell program
+ *
+ * Return: 0 on success, or error code
  */
-
-int main(__attribute((unused)) int ac, __attribute((unused)) char **arvs, __attribute((unused)) char **envp)
+int main(void)
 {
-	int status = 0;
-	char *input, *delimiter, *which;
-	size_t number_of_malloc_bytes_allocated, command_num;
-	char **array_of_tokens;
+	char *input;
+	char **args;
+	ssize_t read;
+	size_t bufsize = 0;
 
-	signal(SIGINT, sigint_handler);
-	input = NULL;
-	number_of_malloc_bytes_allocated = command_num = 0;
-	delimiter = " \n";
 	while (1)
 	{
-		command_num++;
-		_getline(&input, &number_of_malloc_bytes_allocated, status);
-		array_of_tokens = array_maker(input, delimiter);
-		if (!(*array_of_tokens))
-			status = 0;
-		else
+		if (isatty(STDIN_FILENO))
+		_puts("cisfun$ ");
+
+		read = getline(&input, &bufsize, stdin);
+		if (read == -1)
+			break;
+
+		args = parse_input(input);
+		if (args[0] != NULL)
 		{
-			if (is_builtin(array_of_tokens))
-			{
-				if (builin_handler(array_of_tokens) == EXIT_CODE)
-				{
-					free_main(array_of_tokens, input);
-					exit(status);
-				}
-			}
+			if (is_builtin(args))
+				execute_builtin(args);
 			else
-			{
-				which = _which(array_of_tokens[0]);
-				if (which !=  NULL)
-					status = _fork(which, array_of_tokens);
-				else
-					status = error_not_found(arvs, array_of_tokens, command_num);
-			}
+				execute_command(args);
 		}
-		free_main(array_of_tokens, input);
-		input = NULL;
+
+		free_input(args);
 	}
+
+	free(input);
 	return (0);
 }
-
-/* Implement other functions in main.c as required */
-
