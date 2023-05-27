@@ -1,6 +1,10 @@
-#include "main.h"
+#include "myshell.h"
 /**
- *
+ * main - entry point
+ * @ac: argc
+ * @arv: argv
+ * @envp: environment
+ * Return: 0 on success
  */
 
 int main(__attribute((unused)) int ac, __attribute((unused)) char **arvs, __attribute((unused)) char **envp)
