@@ -12,5 +12,7 @@
 
 void prompt(void);
 void sigint_handler(int signal);
+void execute_builtin(char **args);
+void execute_command(char **args);
 
 #endif
